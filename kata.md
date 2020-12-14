@@ -75,3 +75,5 @@ Going back to the code we understand that this summary is printed before the act
 Now that we have our first test case, we can easily add tests for all the scenario's between rock, paper and scissors
 
 The only change in the main code we need is changing `p1Win++` TO `p1.setWins();`. We already know why
+
+One tiny refactoring that we can do is to create a stub for our choice generator

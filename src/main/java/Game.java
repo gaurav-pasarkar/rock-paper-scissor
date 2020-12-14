@@ -1,6 +1,28 @@
+import java.util.ArrayList;
+import java.util.List;
+
 public class Game {
 
-  public static void main(String args[]) {
+  private final List<String> outputs = new ArrayList<>();
+  private final ChoiceGenerator choiceGenerator;
+  private final int gamesToWin;
+
+  public Game(ChoiceGenerator choiceGenerator) {
+    this.choiceGenerator = choiceGenerator;
+    this.gamesToWin = 3;
+  }
+
+  public Game(ChoiceGenerator choiceGenerator, int gamesToWin) {
+    this.choiceGenerator = choiceGenerator;
+    this.gamesToWin = gamesToWin;
+  }
+
+  private void captureOutputAndPrint(String output) {
+    outputs.add(output);
+    System.out.println(output);
+  }
+  
+  public List<String> execute() {
     Player p1 = new Player();
     Player p2 = new Player();
     boolean gameWon = false;
@@ -10,48 +32,55 @@ public class Game {
     int draw = 0;
     String p1Choice;
     String p2Choice;
+    
     // Game Loop
     do {
-      System.out.println("***** Round: " +
+      captureOutputAndPrint("***** Round: " +
           roundsPlayed + " *********************\n");
-      System.out.println("Number of Draws: " +
+      captureOutputAndPrint("Number of Draws: " +
           draw + "\n");
-      p1Choice = p1.playerChoice();
-      System.out.println("Player 1: " + p1Choice +
+      p1Choice = choiceGenerator.getChoice();
+      captureOutputAndPrint("Player 1: " + p1Choice +
           "\t Player 1 Total Wins: " + p1Wins);
-      p2Choice = p2.playerChoice();
-      System.out.println("Player 2: " + p2Choice +
+      p2Choice = choiceGenerator.getChoice();
+      captureOutputAndPrint("Player 2: " + p2Choice +
           "\t Player 2 Total Wins: " + p2Wins);
-      if ((p1Choice.equals("rock")) && (p2Choice.equals("paper"))) {
-        System.out.println("Player 2 Wins");
+      if ((p1Choice.equals(Choices.ROCK.getValue())) && (p2Choice.equals(Choices.PAPER.getValue()))) {
+        captureOutputAndPrint("Player 2 Wins");
         p2Wins++;  // trying a couple different ways to get count to work
-      } else if ((p1Choice.equals("paper")) && (p2Choice.equals("rock"))) {
+      } else if ((p1Choice.equals(Choices.PAPER.getValue())) && (p2Choice.equals(Choices.ROCK.getValue()))) {
         p1Wins++;
-        System.out.println("Player 1 Wins");
-      } else if ((p1Choice.equals("rock")) && (p2Choice.equals("scissors"))) {
+        captureOutputAndPrint("Player 1 Wins");
+      } else if ((p1Choice.equals(Choices.ROCK.getValue())) && (p2Choice.equals(Choices.SCISSOR.getValue()))) {
         p1Wins = p1.setWins();
-        System.out.println("Player 1 Wins");
-      } else if ((p1Choice.equals("scissors")) && (p2Choice.equals("rock"))) {
+        captureOutputAndPrint("Player 1 Wins");
+      } else if ((p1Choice.equals(Choices.SCISSOR.getValue())) && (p2Choice.equals(Choices.ROCK.getValue()))) {
         p2Wins = p2.setWins();
-        System.out.println("Player 2 Wins");
-      } else if ((p1Choice.equals("scissors")) && (p2Choice.equals("paper"))) {
+        captureOutputAndPrint("Player 2 Wins");
+      } else if ((p1Choice.equals(Choices.SCISSOR.getValue())) && (p2Choice.equals(Choices.PAPER.getValue()))) {
         p1Wins = p1.setWins();
-        System.out.println("Player 1 Wins");
-      } else if ((p1Choice.equals("paper")) && (p2Choice.equals("scissors"))) {
+        captureOutputAndPrint("Player 1 Wins");
+      } else if ((p1Choice.equals(Choices.PAPER.getValue())) && (p2Choice.equals(Choices.SCISSOR.getValue()))) {
         p2Wins = p2.setWins();
-        System.out.println("Player 2 Wins");
+        captureOutputAndPrint("Player 2 Wins");
       }
       if (p1Choice == p2Choice) {
         draw++;
-        System.out.println("\n\t\t\t Draw \n");
+        captureOutputAndPrint("\n\t\t\t Draw \n");
       }
       roundsPlayed++;
-      if ((p1.getWins() >= 3) || (p2.getWins() >= 3)) {
+      if ((p1.getWins() >= gamesToWin) || (p2.getWins() >= gamesToWin)) {
         gameWon = true;
-        System.out.println("GAME WON");
+        captureOutputAndPrint("GAME WON");
       }
-      System.out.println();
+      captureOutputAndPrint("");
     } while (gameWon != true);
+
+    return outputs;
+  }
+  
+  public static void main(String args[]) {
+    new Game(new RandomChoiceGenerator()).execute();
   }
 }
 
@@ -62,26 +91,6 @@ class Player {
 
   int wins;      // # of wins
   int winTotal;
-
-  /**
-   * Randomly choose rock, paper, or scissors
-   */
-  public String playerChoice() {
-    String choice = "";
-    int c = (int) (Math.random() * 3);
-    switch (c) {
-      case 0:
-        choice = ("rock");
-        break;
-      case 1:
-        choice = ("paper");
-        break;
-      case 2:
-        choice = ("scissors");
-        break;
-    }
-    return choice;
-  }
 
   public int setWins() {
     int winTotal = wins++;

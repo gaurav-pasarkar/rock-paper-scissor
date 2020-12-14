@@ -22,3 +22,50 @@ _Inject the `GAME_WON` deciding factor. This will enable us to write tests in a 
 > Values for Rock, Paper and Scissors are not constants.
 
 _Move them to an enum_
+
+---
+
+# Iteration 2
+Let us now start to add tests assuming the program works. A simple way to write assertions here is actual = expected. This is far from correct, but it's a starting point.
+
+>We will use `JUnit5` and `AssertJ` matchers for our test setup
+
+As we now have a way to inject `FixedChoiceGenerator` and `GameWonCriteria`, out first test is with Player1 playing `Rock` and Player2 playing `Paper`. As we know `paper covers rock`, so Player2 wins
+
+We create a stub for the ChoiceGenerator and complete our first awesome test. While running it, this happens
+```
+***** Round: 0 *********************
+
+Number of Draws: 0
+
+Player 1: rock	 Player 1 Total Wins: 0
+Player 2: paper	 Player 2 Total Wins: 0
+Player 2 Wins
+
+***** Round: 1 *********************
+
+Number of Draws: 0
+
+
+java.lang.ArrayIndexOutOfBoundsException: Index 2 out of bounds for length 2
+```
+Now we wanted the program to stop after 1 iteration, and our choices seemed to have been stubbed properly. Then what has gone wrong ?
+Just look at the following lines of code. We are assigning p1.wins to a variable, incrementing it and then using getWins getter to fetch its value. The player class does have a setter to update win count. There is also an amazing comment which points us to the same direction
+
+```
+  int p1Wins = p1.wins;
+  ..
+  ..
+     p2Wins++;  // trying a couple different ways to get count to work
+  ..
+  ..
+   if ((p1.getWins() >= gamesToWin) || (p2.getWins() >= gamesToWin)) {
+        gameWon = true;
+```
+
+Changing `p2Wins++` to `p2.setWins()`. Just like that, we fixed a small bug and have a test to assert it... \m/
+
+Looking at the test output, a couple of things still seem to be off
+- The Round starts with zero
+- Player 2 Total wins is still 0. 
+Going back to the code we understand that this summary is printed before the actual evaluation of choices. This is another bug that needs attention. But as we do not have enough test coverage, we will come back to this later.

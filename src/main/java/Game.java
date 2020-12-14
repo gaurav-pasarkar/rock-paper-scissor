@@ -47,7 +47,7 @@ public class Game {
           "\t Player 2 Total Wins: " + p2Wins);
       if ((p1Choice.equals(Choices.ROCK.getValue())) && (p2Choice.equals(Choices.PAPER.getValue()))) {
         captureOutputAndPrint("Player 2 Wins");
-        p2Wins++;  // trying a couple different ways to get count to work
+        p2.setWins();  // trying a couple different ways to get count to work
       } else if ((p1Choice.equals(Choices.PAPER.getValue())) && (p2Choice.equals(Choices.ROCK.getValue()))) {
         p1Wins++;
         captureOutputAndPrint("Player 1 Wins");

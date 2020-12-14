@@ -69,3 +69,9 @@ Looking at the test output, a couple of things still seem to be off
 - The Round starts with zero
 - Player 2 Total wins is still 0. 
 Going back to the code we understand that this summary is printed before the actual evaluation of choices. This is another bug that needs attention. But as we do not have enough test coverage, we will come back to this later.
+---
+
+# Iteration 3
+Now that we have our first test case, we can easily add tests for all the scenario's between rock, paper and scissors
+
+The only change in the main code we need is changing `p1Win++` TO `p1.setWins();`. We already know why

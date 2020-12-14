@@ -49,7 +49,7 @@ public class Game {
         captureOutputAndPrint("Player 2 Wins");
         p2.setWins();  // trying a couple different ways to get count to work
       } else if ((p1Choice.equals(Choices.PAPER.getValue())) && (p2Choice.equals(Choices.ROCK.getValue()))) {
-        p1Wins++;
+        p1.setWins();
         captureOutputAndPrint("Player 1 Wins");
       } else if ((p1Choice.equals(Choices.ROCK.getValue())) && (p2Choice.equals(Choices.SCISSOR.getValue()))) {
         p1Wins = p1.setWins();

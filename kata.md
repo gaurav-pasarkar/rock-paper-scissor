@@ -76,4 +76,8 @@ Now that we have our first test case, we can easily add tests for all the scenar
 
 The only change in the main code we need is changing `p1Win++` TO `p1.setWins();`. We already know why
 
-One tiny refactoring that we can do is to create a stub for our choice generator
+> One tiny refactoring that we can do is to create a stub for our choice generator
+
+The only remaining test to write is for the `Draw` case. As we now have a stub for fixed choice generator, we can stub following choices `Rock, Rock, Rock, Scissor`. This will ensure that the first round is a draw and Player1 wins the next.
+
+_Again, the number of draws count seems off. It is getting printed before the evaluation of choices. Let's fix this in the next iteration_

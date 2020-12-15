@@ -7,6 +7,13 @@ public class Game {
   private final ChoiceGenerator choiceGenerator;
   private final int gamesToWin;
 
+  private final Player p1 = new Player();
+  private final Player p2 = new Player();
+  private int roundsPlayed = 1;    // Number of rounds played
+  private int numberOfDraws = 0;
+  private String p1Choice;
+  private String p2Choice;
+
   public Game(ChoiceGenerator choiceGenerator) {
     this.choiceGenerator = choiceGenerator;
     this.gamesToWin = 3;
@@ -21,52 +28,49 @@ public class Game {
     outputs.add(output);
     System.out.println(output);
   }
-  
+
+  private void computeRoundSummary(String roundResult) {
+    captureOutputAndPrint("***** Round: " +
+        roundsPlayed + " *********************\n");
+    captureOutputAndPrint("Number of Draws: " +
+        numberOfDraws + "\n");
+    captureOutputAndPrint("Player 1: " + p1Choice +
+        "\t Player 1 Total Wins: " + p1.getWins());
+    captureOutputAndPrint("Player 2: " + p2Choice +
+        "\t Player 2 Total Wins: " + p2.getWins());
+    captureOutputAndPrint(roundResult);
+  }
+
   public List<String> execute() {
-    Player p1 = new Player();
-    Player p2 = new Player();
     boolean gameWon = false;
-    int roundsPlayed = 0;    // Number of rounds played
-    int p1Wins = p1.wins;
-    int p2Wins = p2.wins;
-    int draw = 0;
-    String p1Choice;
-    String p2Choice;
-    
+
     // Game Loop
     do {
-      captureOutputAndPrint("***** Round: " +
-          roundsPlayed + " *********************\n");
-      captureOutputAndPrint("Number of Draws: " +
-          draw + "\n");
       p1Choice = choiceGenerator.getChoice();
-      captureOutputAndPrint("Player 1: " + p1Choice +
-          "\t Player 1 Total Wins: " + p1Wins);
       p2Choice = choiceGenerator.getChoice();
-      captureOutputAndPrint("Player 2: " + p2Choice +
-          "\t Player 2 Total Wins: " + p2Wins);
+
       if ((p1Choice.equals(Choices.ROCK.getValue())) && (p2Choice.equals(Choices.PAPER.getValue()))) {
-        captureOutputAndPrint("Player 2 Wins");
-        p2.setWins();  // trying a couple different ways to get count to work
+        p2.declareWinner();  // trying a couple different ways to get count to work
+        computeRoundSummary("Player 2 Wins");
       } else if ((p1Choice.equals(Choices.PAPER.getValue())) && (p2Choice.equals(Choices.ROCK.getValue()))) {
-        p1.setWins();
-        captureOutputAndPrint("Player 1 Wins");
+        p1.declareWinner();
+        computeRoundSummary("Player 1 Wins");
       } else if ((p1Choice.equals(Choices.ROCK.getValue())) && (p2Choice.equals(Choices.SCISSOR.getValue()))) {
-        p1Wins = p1.setWins();
-        captureOutputAndPrint("Player 1 Wins");
+        p1.declareWinner();
+        computeRoundSummary("Player 1 Wins");
       } else if ((p1Choice.equals(Choices.SCISSOR.getValue())) && (p2Choice.equals(Choices.ROCK.getValue()))) {
-        p2Wins = p2.setWins();
-        captureOutputAndPrint("Player 2 Wins");
+        p2.declareWinner();
+        computeRoundSummary("Player 2 Wins");
       } else if ((p1Choice.equals(Choices.SCISSOR.getValue())) && (p2Choice.equals(Choices.PAPER.getValue()))) {
-        p1Wins = p1.setWins();
-        captureOutputAndPrint("Player 1 Wins");
+        p1.declareWinner();
+        computeRoundSummary("Player 1 Wins");
       } else if ((p1Choice.equals(Choices.PAPER.getValue())) && (p2Choice.equals(Choices.SCISSOR.getValue()))) {
-        p2Wins = p2.setWins();
-        captureOutputAndPrint("Player 2 Wins");
+        p2.declareWinner();
+        computeRoundSummary("Player 2 Wins");
       }
       if (p1Choice == p2Choice) {
-        draw++;
-        captureOutputAndPrint("\n\t\t\t Draw \n");
+        numberOfDraws++;
+        computeRoundSummary("\n\t\t\t Draw \n");
       }
       roundsPlayed++;
       if ((p1.getWins() >= gamesToWin) || (p2.getWins() >= gamesToWin)) {
@@ -90,11 +94,9 @@ public class Game {
 class Player {
 
   int wins;      // # of wins
-  int winTotal;
 
-  public int setWins() {
-    int winTotal = wins++;
-    return winTotal;
+  public void declareWinner() {
+    wins++;
   }
 
   public int getWins() {

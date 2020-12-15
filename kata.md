@@ -81,3 +81,56 @@ The only change in the main code we need is changing `p1Win++` TO `p1.setWins();
 The only remaining test to write is for the `Draw` case. As we now have a stub for fixed choice generator, we can stub following choices `Rock, Rock, Rock, Scissor`. This will ensure that the first round is a draw and Player1 wins the next.
 
 _Again, the number of draws count seems off. It is getting printed before the evaluation of choices. Let's fix this in the next iteration_
+
+---
+
+# Iteration 4
+Now that we have a good test coverage, let's first fix the round summary.
+
+As discussed earlier, the core problem is that the round summary is printed before evaluation of the choices. So creating the summary after evaluation of the choices
+
+Adding a test case to validate round summary now.
+We ignored the actual value of the counts in our previous assertions.
+Now that changes to something like below.
+```
+    assertThat(outputs.get(0)).isEqualTo("***** Round: 1 *********************\n");
+    assertThat(outputs.get(1)).isEqualTo("Number of Draws: 0\n");
+    assertThat(outputs.get(2)).isEqualTo("Player 1: rock\t Player 1 Total Wins: 0");
+    assertThat(outputs.get(3)).isEqualTo("Player 2: paper\t Player 2 Total Wins: 1");
+    assertThat(outputs.get(4)).isEqualTo("Player 2 Wins");
+    assertThat(outputs.get(5)).isEqualTo("GAME WON");
+    assertThat(outputs.get(6)).isEqualTo("");
+```
+
+As for our main code, we will move the method variables to instance 
+```
+    Player p1 = new Player();
+    Player p2 = new Player();
+    int roundsPlayed = 0;    // Number of rounds played
+    int draw = 0;
+    String p1Choice;
+    String p2Choice;
+```
+We do not need the below variables as the number of wins is stored inside Player
+
+~~int p1Wins = p1.wins;~~
+
+~~int p2Wins = p2.wins;~~
+
+Next we will create a private method to compute our summary
+```
+  private void computeRoundSummary(String roundResult) {
+    captureOutputAndPrint("***** Round: " +
+        roundsPlayed + " *********************\n");
+    captureOutputAndPrint("Number of Draws: " +
+        numberOfDraws + "\n");
+    captureOutputAndPrint("Player 1: " + p1Choice +
+        "\t Player 1 Total Wins: " + p1.getWins());
+    captureOutputAndPrint("Player 2: " + p2Choice +
+        "\t Player 2 Total Wins: " + p2.getWins());
+    captureOutputAndPrint(roundResult);
+  }
+```
+
+Finally, we will rename the `setWins`  in Player to `declareWinner`. Making the return type as void as no one is using it now.
+Also getting rid of the unnecessary logic to increment a count.

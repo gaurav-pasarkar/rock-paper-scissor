@@ -1,3 +1,3 @@
 public interface ChoiceGenerator {
-  String getChoice();
+  Choices getChoice();
 }

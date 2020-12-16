@@ -1,7 +1,22 @@
 public enum Choices {
-  ROCK("rock"),
-  PAPER("paper"),
-  SCISSOR("scissors");
+  ROCK("rock"){
+    @Override
+    public boolean canBeat(Choices choice) {
+      return choice.equals(SCISSOR);
+    }
+  },
+  PAPER("paper") {
+    @Override
+    public boolean canBeat(Choices choice) {
+      return choice.equals(ROCK);
+    }
+  },
+  SCISSOR("scissors") {
+    @Override
+    public boolean canBeat(Choices choice) {
+      return choice.equals(PAPER);
+    }
+  };
 
   private final String value;
 
@@ -12,4 +27,6 @@ public enum Choices {
   public String getValue() {
     return value;
   }
+
+  public abstract boolean canBeat(Choices choice);
 }

@@ -4,24 +4,23 @@ import java.util.List;
 public class Game {
 
   private final List<String> outputs = new ArrayList<>();
-  private final ChoiceGenerator choiceGenerator;
   private final int gamesToWin;
 
-  private final Player p1 = new Player();
-  private final Player p2 = new Player();
+  private final Player p1;
+  private final Player p2;
   private int roundsPlayed = 1;    // Number of rounds played
   private int numberOfDraws = 0;
-  private String p1Choice;
-  private String p2Choice;
 
   public Game(ChoiceGenerator choiceGenerator) {
-    this.choiceGenerator = choiceGenerator;
     this.gamesToWin = 3;
+    this.p1 = new Player(choiceGenerator);
+    this.p2 = new Player(choiceGenerator);
   }
 
   public Game(ChoiceGenerator choiceGenerator, int gamesToWin) {
-    this.choiceGenerator = choiceGenerator;
     this.gamesToWin = gamesToWin;
+    this.p1 = new Player(choiceGenerator);
+    this.p2 = new Player(choiceGenerator);
   }
 
   private void captureOutputAndPrint(String output) {
@@ -34,9 +33,9 @@ public class Game {
         roundsPlayed + " *********************\n");
     captureOutputAndPrint("Number of Draws: " +
         numberOfDraws + "\n");
-    captureOutputAndPrint("Player 1: " + p1Choice +
+    captureOutputAndPrint("Player 1: " + p1.getChoice().getValue() +
         "\t Player 1 Total Wins: " + p1.getWins());
-    captureOutputAndPrint("Player 2: " + p2Choice +
+    captureOutputAndPrint("Player 2: " + p2.getChoice().getValue() +
         "\t Player 2 Total Wins: " + p2.getWins());
     captureOutputAndPrint(roundResult);
   }
@@ -46,32 +45,20 @@ public class Game {
 
     // Game Loop
     do {
-      p1Choice = choiceGenerator.getChoice();
-      p2Choice = choiceGenerator.getChoice();
+      p1.makeChoice();
+      p2.makeChoice();
 
-      if ((p1Choice.equals(Choices.ROCK.getValue())) && (p2Choice.equals(Choices.PAPER.getValue()))) {
-        p2.declareWinner();  // trying a couple different ways to get count to work
-        computeRoundSummary("Player 2 Wins");
-      } else if ((p1Choice.equals(Choices.PAPER.getValue())) && (p2Choice.equals(Choices.ROCK.getValue()))) {
+      if(p1.canBeat(p2)){
         p1.declareWinner();
         computeRoundSummary("Player 1 Wins");
-      } else if ((p1Choice.equals(Choices.ROCK.getValue())) && (p2Choice.equals(Choices.SCISSOR.getValue()))) {
-        p1.declareWinner();
-        computeRoundSummary("Player 1 Wins");
-      } else if ((p1Choice.equals(Choices.SCISSOR.getValue())) && (p2Choice.equals(Choices.ROCK.getValue()))) {
+      } else if (p2.canBeat(p1)) {
         p2.declareWinner();
         computeRoundSummary("Player 2 Wins");
-      } else if ((p1Choice.equals(Choices.SCISSOR.getValue())) && (p2Choice.equals(Choices.PAPER.getValue()))) {
-        p1.declareWinner();
-        computeRoundSummary("Player 1 Wins");
-      } else if ((p1Choice.equals(Choices.PAPER.getValue())) && (p2Choice.equals(Choices.SCISSOR.getValue()))) {
-        p2.declareWinner();
-        computeRoundSummary("Player 2 Wins");
-      }
-      if (p1Choice == p2Choice) {
+      } else {
         numberOfDraws++;
         computeRoundSummary("\n\t\t\t Draw \n");
       }
+
       roundsPlayed++;
       if ((p1.getWins() >= gamesToWin) || (p2.getWins() >= gamesToWin)) {
         gameWon = true;
@@ -85,21 +72,5 @@ public class Game {
   
   public static void main(String args[]) {
     new Game(new RandomChoiceGenerator()).execute();
-  }
-}
-
-/**
- *
- */
-class Player {
-
-  int wins;      // # of wins
-
-  public void declareWinner() {
-    wins++;
-  }
-
-  public int getWins() {
-    return (wins);
   }
 }

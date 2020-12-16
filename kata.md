@@ -134,3 +134,96 @@ Next we will create a private method to compute our summary
 
 Finally, we will rename the `setWins`  in Player to `declareWinner`. Making the return type as void as no one is using it now.
 Also getting rid of the unnecessary logic to increment a count.
+
+---
+
+# Iteration 5
+Now that we have got all the bugs ironed out, let us see if there are any code smells
+
+Our `GameTest` suggest that we have similar choices being evaluated for both the players.
+Look at `shouldDeclarePlayer1AsWinner_As_PaperCoversRock()` and `shouldDeclarePlayer2AsWinner_As_PaperCoversRock()`
+
+The main code also asserts this understanding
+
+`(p1Choice.equals(Choices.PAPER.getValue())) && (p2Choice.equals(Choices.ROCK.getValue()))`
+
+`(p1Choice.equals(Choices.ROCK.getValue())) && (p2Choice.equals(Choices.PAPER.getValue()))`
+
+> All the `Game` cares about it is if `Player 1` canBeat `Player 2`. Whether player 1 chooses a Rock or even a Mountain, the Game need not worry.
+
+So delegating responsibility if making a choice to the Player. Our PlayerTest now looks like this
+```
+    Player p1 = new Player(getFixedChoiceGenerator(Choices.ROCK));
+    Player p2 = new Player(getFixedChoiceGenerator(Choices.SCISSOR));
+
+    p1.makeChoice();
+    p2.makeChoice();
+
+    assertThat(p1.canBeat(p2)).isTrue();
+    assertThat(p2.canBeat(p1)).isFalse();
+```
+
+This forces us to inject choiceGenerator to player class. Also add implementations for `makeChoice` and `canBeat`
+
+`makeChoice` is straightForward. All it does is pick a choice from the generator
+
+A player can only beat the other player if his choice was better than him/her. Comparing choices is not really a responsibility of the Player. This means `player.canBeat` will internally talk to `choice.canBeat` to find out if it can beat the other player
+The `canBeat` in Player now looks like this
+```
+  public boolean canBeat(Player player) {
+    return this.choice.canBeat(player.getChoice());
+  }
+```
+
+Now we have the contract for Player domain model ready. The test won't pass unless we mock `choice.canBeat`. Instead of taking the mock route, lets go ahead and fulfill the contract for our Choices enum
+
+ChoiceTest looks like this 
+```
+  @Test
+  public void givenRock_shouldCrushScissor() {
+    assertThat(Choices.ROCK.canBeat(Choices.SCISSOR)).isTrue();
+    assertThat(Choices.ROCK.canBeat(Choices.PAPER)).isFalse();
+    assertThat(Choices.ROCK.canBeat(Choices.ROCK)).isFalse();
+  }
+```
+Implementing this is fairly easy. We just add an abstract method `canBeat` to our enum and implement it for every choice like this
+```
+ ROCK("rock"){
+    @Override
+    public boolean canBeat(Choices choice) {
+      return choice.equals(SCISSOR);
+    }
+  }
+```
+So a Rock can only crush a Scissor. It will return false for everything else.
+
+Adding tests for PaperCoversRock and ScissorsCutPaper is derivative now
+
+Now that we have completed Choice implementation, we can continue our tests for Player and add tests for Player 2 winning, and a draw
+The Player domain is now shaping up. All we need to do is to plug it in the Game class
+
+The Game logic can now be simplified as below.
+```
+      p1.makeChoice();
+      p2.makeChoice();
+
+      if(p1.canBeat(p2)){
+        p1.declareWinner();
+        computeRoundSummary("Player 1 Wins");
+      } else if (p2.canBeat(p1)) {
+        p2.declareWinner();
+        computeRoundSummary("Player 2 Wins");
+      } else {
+        numberOfDraws++;
+        computeRoundSummary("\n\t\t\t Draw \n");
+      }
+```
+Now the game need not maintain the choices of the players. That makes sense. Getting rid `p1Choice` and `p2Choice` to wrap up the change.
+
+> We have our safety net of integration tests for Game available, and they work just fine. So life's good
+
+> Looking back at our GameTest, now we do not need these duplicate tests
+`shouldDeclarePlayer1AsWinner_As_PaperCoversRock()`
+`shouldDeclarePlayer2AsWinner_As_PaperCoversRock()`
+
+Let us only keep 1 for each player now

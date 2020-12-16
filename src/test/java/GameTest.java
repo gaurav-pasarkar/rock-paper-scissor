@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test;
 class GameTest {
 
   @Test
-  public void shouldDeclarePlayer2AsWinner_As_PaperCoversRock() {
+  public void shouldDeclarePlayer2AsWinner() {
     ChoiceGenerator fixedChoice = getFixedChoiceGenerator(Choices.ROCK, Choices.PAPER);
 
     List<String> outputs = new Game(fixedChoice, 1).execute();
@@ -24,7 +24,7 @@ class GameTest {
   }
 
   @Test
-  public void shouldDeclarePlayer1AsWinner_As_PaperCoversRock() {
+  public void shouldDeclarePlayer1AsWinner() {
     ChoiceGenerator fixedChoice = getFixedChoiceGenerator(Choices.PAPER, Choices.ROCK);
 
     List<String> outputs = new Game(fixedChoice, 1).execute();
@@ -35,70 +35,6 @@ class GameTest {
     assertThat(outputs.get(2)).startsWith("Player 1: paper");
     assertThat(outputs.get(3)).startsWith("Player 2: rock");
     assertThat(outputs.get(4)).isEqualTo("Player 1 Wins");
-    assertThat(outputs.get(5)).isEqualTo("GAME WON");
-    assertThat(outputs.get(6)).isEqualTo("");
-  }
-
-  @Test
-  public void shouldDeclarePlayer1AsWinner_As_RockCrushesScissors() {
-    ChoiceGenerator fixedChoice = getFixedChoiceGenerator(Choices.ROCK, Choices.SCISSOR);
-
-    List<String> outputs = new Game(fixedChoice, 1).execute();
-
-    assertThat(outputs.size()).isEqualTo(7);
-    assertThat(outputs.get(0)).startsWith("***** Round: ");
-    assertThat(outputs.get(1)).startsWith("Number of Draws: ");
-    assertThat(outputs.get(2)).startsWith("Player 1: rock");
-    assertThat(outputs.get(3)).startsWith("Player 2: scissors");
-    assertThat(outputs.get(4)).isEqualTo("Player 1 Wins");
-    assertThat(outputs.get(5)).isEqualTo("GAME WON");
-    assertThat(outputs.get(6)).isEqualTo("");
-  }
-
-  @Test
-  public void shouldDeclarePlayer2AsWinner_As_RockCrushesScissors() {
-    ChoiceGenerator fixedChoice = getFixedChoiceGenerator(Choices.SCISSOR, Choices.ROCK);
-
-    List<String> outputs = new Game(fixedChoice, 1).execute();
-
-    assertThat(outputs.size()).isEqualTo(7);
-    assertThat(outputs.get(0)).startsWith("***** Round: ");
-    assertThat(outputs.get(1)).startsWith("Number of Draws: ");
-    assertThat(outputs.get(2)).startsWith("Player 1: scissors");
-    assertThat(outputs.get(3)).startsWith("Player 2: rock");
-    assertThat(outputs.get(4)).isEqualTo("Player 2 Wins");
-    assertThat(outputs.get(5)).isEqualTo("GAME WON");
-    assertThat(outputs.get(6)).isEqualTo("");
-  }
-
-  @Test
-  public void shouldDeclarePlayer1AsWinner_As_ScissorsCutsPaper() {
-    ChoiceGenerator fixedChoice = getFixedChoiceGenerator(Choices.SCISSOR, Choices.PAPER);
-
-    List<String> outputs = new Game(fixedChoice, 1).execute();
-
-    assertThat(outputs.size()).isEqualTo(7);
-    assertThat(outputs.get(0)).startsWith("***** Round: ");
-    assertThat(outputs.get(1)).startsWith("Number of Draws: ");
-    assertThat(outputs.get(2)).startsWith("Player 1: scissors");
-    assertThat(outputs.get(3)).startsWith("Player 2: paper");
-    assertThat(outputs.get(4)).isEqualTo("Player 1 Wins");
-    assertThat(outputs.get(5)).isEqualTo("GAME WON");
-    assertThat(outputs.get(6)).isEqualTo("");
-  }
-
-  @Test
-  public void shouldDeclarePlayer2AsWinner_As_ScissorsCutsPaper() {
-    ChoiceGenerator fixedChoice = getFixedChoiceGenerator(Choices.PAPER, Choices.SCISSOR);
-
-    List<String> outputs = new Game(fixedChoice, 1).execute();
-
-    assertThat(outputs.size()).isEqualTo(7);
-    assertThat(outputs.get(0)).startsWith("***** Round: ");
-    assertThat(outputs.get(1)).startsWith("Number of Draws: ");
-    assertThat(outputs.get(2)).startsWith("Player 1: paper");
-    assertThat(outputs.get(3)).startsWith("Player 2: scissors");
-    assertThat(outputs.get(4)).isEqualTo("Player 2 Wins");
     assertThat(outputs.get(5)).isEqualTo("GAME WON");
     assertThat(outputs.get(6)).isEqualTo("");
   }
@@ -168,11 +104,11 @@ class GameTest {
 
   private ChoiceGenerator getFixedChoiceGenerator(Choices ...allChoices) {
     return new ChoiceGenerator() {
-      final List<String> choices = Arrays.stream(allChoices).map(Choices::getValue).collect(Collectors.toList());
+      final List<Choices> choices = Arrays.stream(allChoices).collect(Collectors.toList());
       private int index = 0;
 
       @Override
-      public String getChoice() {
+      public Choices getChoice() {
         return choices.get(index++);
       }
     };
